@@ -10,5 +10,9 @@ def index():
 #Commit a 
 #Commit b 
 #Commit c
+<<<<<<< HEAD
 #Commit d
 #Commit e
+=======
+#Commit d
+>>>>>>> b16de65 (Commit MODIFICADO  bcd)
