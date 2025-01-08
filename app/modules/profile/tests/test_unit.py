@@ -9,7 +9,6 @@ from app.modules.profile.models import UserProfile
 @pytest.fixture(scope="module")
 def test_client(test_client):
     """
-    
     Extends the test_client fixture to add additional specific data for module testing.
     for module testing (por example, new users)
     """
