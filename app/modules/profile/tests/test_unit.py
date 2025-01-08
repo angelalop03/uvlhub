@@ -28,6 +28,7 @@ def test_edit_profile_page_get(test_client):
     """
     Tests access to the profile editing page via a GET request.
     """
+    
     login_response = login(test_client, "user@example.com", "test1234")
     assert login_response.status_code == 200, "Login was unsuccessful."
 
