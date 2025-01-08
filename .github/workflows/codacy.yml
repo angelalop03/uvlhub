@@ -22,9 +22,9 @@ jobs:
         ports:
           - 3306:3306
         options: >
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }}"
-          --health-interval=10s
-          --health-timeout=5s
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -p'uvlhub_root_password'" 
+          --health-interval=10s 
+          --health-timeout=5s 
           --health-retries=5
 
     strategy:
@@ -35,10 +35,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Check for outdated dependencies
-      run: |
-        pip list --outdated
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -62,11 +58,11 @@ jobs:
         coverage xml
       env:
         FLASK_ENV: testing
-        MARIADB_HOSTNAME: 127.0.0.1
-        MARIADB_PORT: 3306
-        MARIADB_TEST_DATABASE: uvlhubdb_test
-        MARIADB_USER: uvlhub_user
-        MARIADB_PASSWORD: uvlhub_password
+        MYSQL_HOSTNAME: 127.0.0.1
+        MYSQL_PORT: 3306
+        MYSQL_DATABASE: uvlhubdb_test
+        MYSQL_USER: uvlhub_user
+        MYSQL_PASSWORD: uvlhub_password
 
     - name: Upload coverage file as artifact
       uses: actions/upload-artifact@v3
