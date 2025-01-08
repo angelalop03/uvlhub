@@ -36,4 +36,5 @@ def test_edit_profile_page_get(test_client):
     assert response.status_code == 200, "The profile editing page could not be accessed."
     assert b"Edit profile" in response.data, "The expected content is not present on the page"
 
+
     logout(test_client)
