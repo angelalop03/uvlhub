@@ -3,10 +3,10 @@ name: Codacy CI and Release Workflow
 on:
   push:
     branches:
-      - main
+      - Practica-2
   pull_request:
     branches:
-      - main
+      - Practica-2
   release:
     types:
       - created
@@ -79,6 +79,8 @@ jobs:
         body: ${{ github.event.release.body }}
         draft: false
         prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload Release Assets
       uses: actions/upload-release-asset@v1
