@@ -86,10 +86,15 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Generate Artifact
+      run: |
+        mkdir -p artifacts
+        echo "Sample artifact content" > artifacts/artifact.zip
+
     - name: Upload Release Assets
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release_notes.outputs.upload_url }}
-        asset_path: ./path/to/your/artifact.zip
+        asset_path: ./artifacts/artifact.zip
         asset_name: artifact.zip
         asset_content_type: application/zip
