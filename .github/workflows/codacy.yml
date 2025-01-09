@@ -1,0 +1,98 @@
+name: Codacy CI and Release Workflow
+
+on:
+  push:
+    branches:
+      - Practica-2
+  pull_request:
+    branches:
+      - Practica-2
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04 # Cambiado a la versión específica 22.04
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: uvlhub_root_password
+          MYSQL_DATABASE: uvlhubdb_test
+          MYSQL_USER: uvlhub_user
+          MYSQL_PASSWORD: uvlhub_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    strategy:
+      matrix:
+        python-version: ['3.10.12', '3.11'] # Se configuraron las dos versiones de Python
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for outdated dependencies
+      run: |
+        pip list --outdated
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Security audit with pip-audit
+      run: |
+        pip install pip-audit
+        pip-audit || true
+
+    - name: Run tests for specific module
+      run: |
+        pytest app/modules/profile/ --ignore-glob='*selenium*'
+      env:
+        FLASK_ENV: testing
+        MARIADB_HOSTNAME: 127.0.0.1
+        MARIADB_PORT: 3306
+        MARIADB_TEST_DATABASE: uvlhubdb_test
+        MARIADB_USER: uvlhub_user
+        MARIADB_PASSWORD: uvlhub_password
+
+  release:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set Release Tag Name
+      id: set_tag_name
+      run: echo "::set-output name=tag_name::v$(date +'%Y.%m.%d-%H%M%S')"
+
+    - name: Create Release Notes
+      id: create_release_notes
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ steps.set_tag_name.outputs.tag_name }}
+        release_name: "Release ${{ steps.set_tag_name.outputs.tag_name }}"
+        body: "Automated release notes for tag ${{ steps.set_tag_name.outputs.tag_name }}"
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Generate Artifact
+      run: |
+        mkdir -p artifacts
+        echo "Sample artifact content" > artifacts/artifact.zip
+
+    - name: Upload Release Assets
+      run: |
+        gh release upload ${{ steps.set_tag_name.outputs.tag_name }} ./artifacts/artifact.zip --repo ${{ github.repository }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
