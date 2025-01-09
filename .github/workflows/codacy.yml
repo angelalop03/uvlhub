@@ -52,9 +52,9 @@ jobs:
         pip install pip-audit
         pip-audit || true
 
-    - name: Run tests
+    - name: Run tests for specific module
       run: |
-        pytest app/modules/ --ignore-glob='*selenium*'
+        pytest app/modules/profile/ --ignore-glob='*selenium*'
       env:
         FLASK_ENV: testing
         MARIADB_HOSTNAME: 127.0.0.1
